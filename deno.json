@@ -1,6 +1,7 @@
 {
   "tasks": {
-    "start": "deno run -A --watch=static/,routes/ dev.ts"
+    "dev:server": "deno run -A --watch=static/,routes/ dev.ts",
+    "dev:client": "deno run -A --watch=client/ client/mod.ts"
   },
   "importMap": "./import_map.json",
   "compilerOptions": {
