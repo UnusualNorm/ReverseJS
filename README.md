@@ -1,2 +1,11 @@
-# ReverseJS
-A simple program to manage remote computers!
+# fresh project
+
+### Usage
+
+Start the project:
+
+```
+deno task start
+```
+
+This will watch the project directory and restart as necessary.
