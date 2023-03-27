@@ -13,6 +13,10 @@
     "socket.io-client": "https://esm.sh/socket.io-client@4.6.1",
     "wait/": "https://deno.land/x/wait@0.1.12/",
     "components/": "./components/",
-    "islands/": "./island/"
+    "islands/": "./island/",
+    "tabler_icons_tsx/": "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/",
+    "$fresh_charts/": "https://deno.land/x/fresh_charts@0.2.1/",
+    "dotenv/": "https://deno.land/x/dotenv@v3.2.0/",
+    "monaco-editor": "https://esm.sh/v113/monaco-editor@0.36.1/es2022/monaco-editor.mjs"
   }
 }
