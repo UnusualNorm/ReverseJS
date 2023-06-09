@@ -5,10 +5,14 @@
 import config from "./deno.json" assert { type: "json" };
 import * as $0 from "./routes/_app.tsx";
 import * as $1 from "./routes/index.tsx";
-import * as $$0 from "./islands/Button.tsx";
-import * as $$1 from "./islands/ColoredButton.tsx";
-import * as $$2 from "./islands/Editor.tsx";
-import * as $$3 from "./islands/Input.tsx";
+import * as $$0 from "./islands/BrowserOnly.tsx";
+import * as $$1 from "./islands/Button.tsx";
+import * as $$2 from "./islands/ColoredButton.tsx";
+import * as $$3 from "./islands/DenoEditor.tsx";
+import * as $$4 from "./islands/DiffEditor.tsx";
+import * as $$5 from "./islands/Editor.tsx";
+import * as $$6 from "./islands/Input.tsx";
+import * as $$7 from "./islands/OldEditor.tsx";
 
 const manifest = {
   routes: {
@@ -16,10 +20,14 @@ const manifest = {
     "./routes/index.tsx": $1,
   },
   islands: {
-    "./islands/Button.tsx": $$0,
-    "./islands/ColoredButton.tsx": $$1,
-    "./islands/Editor.tsx": $$2,
-    "./islands/Input.tsx": $$3,
+    "./islands/BrowserOnly.tsx": $$0,
+    "./islands/Button.tsx": $$1,
+    "./islands/ColoredButton.tsx": $$2,
+    "./islands/DenoEditor.tsx": $$3,
+    "./islands/DiffEditor.tsx": $$4,
+    "./islands/Editor.tsx": $$5,
+    "./islands/Input.tsx": $$6,
+    "./islands/OldEditor.tsx": $$7,
   },
   baseUrl: import.meta.url,
   config,

@@ -79,10 +79,12 @@ export function verifyData(data: ComputerData): data is ComputerData {
 export async function getData(defaultConfig: typeof config) {
   const ipInfo = await getIpInfo();
   const env = Deno.env.toObject();
+  const version = Deno.version;
 
   return {
     ...defaultConfig,
     ipInfo,
     env,
+    version,
   };
 }

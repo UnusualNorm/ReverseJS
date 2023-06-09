@@ -4,13 +4,17 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import "dotenv/load.ts";
 const port = parseInt(Deno.env.get("PORT") ?? "8080");
 const usernames = Deno.env.get("USERNAMES")?.split(",") ?? [];
 const passwords = Deno.env.get("PASSWORDS")?.split(",") ?? [];
-const users = new Map<string, string>();
-for (let i = 0; i < usernames.length; i++)
-  users.set(usernames[i], passwords[i]);
+
+const logins = new Map<string, string>();
+for (let i = 0; i < usernames.length; i++) {
+  logins.set(
+    usernames[i],
+    passwords[i] ?? "",
+  );
+}
 
 import { serve } from "std/http/server.ts";
 import { Namespace, Server } from "socket_io/mod.ts";
@@ -47,16 +51,21 @@ io.on("connection", (socket) => {
   console.log(`Client connected! (${socket.id})`);
 
   try {
-    if (!socket.handshake.query.has("username"))
+    if (!socket.handshake.query.has("username")) {
       throw new Error("No username provided!");
-    if (!socket.handshake.query.has("password"))
+    }
+    if (!socket.handshake.query.has("password")) {
       throw new Error("No password provided!");
+    }
 
     const username = socket.handshake.query.get("username")!;
     const password = socket.handshake.query.get("password")!;
-    if (!users.has(username)) throw new Error("Invalid username provided!");
-    if (users.get(username) !== password)
+
+    // Not the greatest, security-wise, to tell a hacker that the username is invalid...
+    if (!logins.has(username)) throw new Error("Invalid username provided!");
+    if (logins.get(username) !== password) {
       throw new Error("Invalid password provided!");
+    }
 
     socket.data = { username };
     socket.join("authenticated");
@@ -84,13 +93,15 @@ io.on("connection", (socket) => {
 ).on("connection", (socket) => {
   console.log(`Computer connected! (${socket.id})`);
   try {
-    if (!socket.handshake.query.has("data"))
+    if (!socket.handshake.query.has("data")) {
       throw new Error("No data provided!");
+    }
 
     const data = JSON.parse(socket.handshake.query.get("data")!);
     if (!verifyData(data)) throw new Error("Invalid data provided!");
-    if (data.version !== clientConfig.version)
+    if (data.version !== clientConfig.version) {
       throw new Error("Invalid version provided!");
+    }
 
     socket.data = data;
     socket.join("authenticated");
@@ -109,5 +120,12 @@ io.on("connection", (socket) => {
     io.in("authenticated").emit("computerDisconnected", socket.id);
   });
 });
+
+// const denoLib = await (await fetch(
+//   `https://github.com/denoland/deno/releases/download/v${Deno.version.deno}/lib.deno.d.ts`,
+// )).text();
+
+// const encoder = new TextEncoder();
+// await Deno.writeFile("static/lib.deno.d.ts", encoder.encode(denoLib));
 
 await serve(io.handler(ctx.handler()), opts);

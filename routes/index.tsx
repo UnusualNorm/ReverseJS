@@ -1,9 +1,10 @@
-import { Head } from "$fresh/runtime.ts";
+import { asset, Head } from "$fresh/runtime.ts";
 import { Chart } from "$fresh_charts/mod.ts";
 import { ChartColors, transparentize } from "$fresh_charts/utils.ts";
 import Card from "components/Card.tsx";
-// import Editor from "../islands/Editor.tsx";
-import AceEditor from "https://esm.sh/react-ace@10.1.0?alias=react:preact/compat,react-dom:preact/compat";
+import Editor from "islands/Editor.tsx";
+import DenoEditor from "islands/DenoEditor.tsx";
+import BrowserOnly from "islands/BrowserOnly.tsx";
 
 export default function Home() {
   return (
@@ -41,6 +42,11 @@ export default function Home() {
         />
       </div>
 
+      <DenoEditor
+        height="90vh"
+        defaultValue="// some comment"
+      />;
+
       <div class="p-4 mx-auto max-w-screen-md">
         <Chart
           type="line"
@@ -70,15 +76,6 @@ export default function Home() {
                 borderWidth: 1,
               },
             ],
-          }}
-        />
-      </div>
-
-      <div class="p-4 mx-auto max-w-screen-md">
-        <AceEditor
-          style={{
-            height: "100%",
-            width: "100%",
           }}
         />
       </div>

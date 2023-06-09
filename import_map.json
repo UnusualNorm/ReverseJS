@@ -1,22 +1,32 @@
 {
   "imports": {
-    "$fresh/": "https://deno.land/x/fresh@1.1.4/",
-    "preact": "https://esm.sh/preact@10.11.0",
-    "preact/": "https://esm.sh/preact@10.11.0/",
-    "preact-render-to-string": "https://esm.sh/*preact-render-to-string@5.2.4",
-    "@preact/signals": "https://esm.sh/*@preact/signals@1.0.3",
-    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.0.1",
-    "twind": "https://esm.sh/twind@0.16.17",
-    "twind/": "https://esm.sh/twind@0.16.17/",
+    "$fresh/": "https://deno.land/x/fresh@1.1.6/",
+    "preact": "https://esm.sh/preact@10.13.1",
+    "preact/": "https://esm.sh/preact@10.13.1/",
+    "preact-render-to-string": "https://esm.sh/*preact-render-to-string@5.2.6",
+    "@preact/signals": "https://esm.sh/*@preact/signals@1.1.3",
+    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.2.3",
+
+    "twind": "https://esm.sh/twind@0.16.19",
+    "twind/": "https://esm.sh/twind@0.16.19/",
+
     "std/": "https://deno.land/std@0.181.0/",
+
     "socket_io/": "https://deno.land/x/socket_io@0.2.0/",
     "socket.io-client": "https://esm.sh/socket.io-client@4.6.1",
-    "wait/": "https://deno.land/x/wait@0.1.12/",
+
     "components/": "./components/",
-    "islands/": "./island/",
+    "islands/": "./islands/",
+    "hooks/": "./hooks/",
+    "utils/": "./utils/",
+    "types/": "./types/",
+
     "tabler_icons_tsx/": "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/",
     "$fresh_charts/": "https://deno.land/x/fresh_charts@0.2.1/",
-    "dotenv/": "https://deno.land/x/dotenv@v3.2.0/",
-    "monaco-editor": "https://esm.sh/v113/monaco-editor@0.36.1/es2022/monaco-editor.mjs"
+
+    "@monaco-editor/loader": "https://esm.sh/@monaco-editor/loader@1.3.3",
+    "monaco-editor": "https://esm.sh/v119/monaco-editor@0.37.1?target=es2022",
+
+    "typescript": "https://esm.sh/typescript@5.1.3?target=es2022"
   }
 }
