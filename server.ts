@@ -15,7 +15,8 @@ export type ClientInfo =
   );
 
 export interface ClientMessage {
-  id: string;
+  clientId: string;
+  userId: string;
   data: string;
   timestamp: number;
 }
@@ -540,8 +541,9 @@ export function onConnection(socket: WebSocket) {
       return;
     }
 
+    data.clientId = clientId;
     data.timestamp = Date.now();
-    onMessage(data.id, data);
+    onMessage(data.userId, data);
     console.info(`[WS] Recieved message from client! (${clientId})`);
   };
 
