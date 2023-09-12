@@ -3,8 +3,8 @@ import { asset } from "$fresh/runtime.ts";
 import { useSignal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
 
-import IconCircleChevronsRight from "tabler_icons_tsx/tsx/circle-chevrons-right.tsx";
-import IconCircleChevronsLeft from "tabler_icons_tsx/tsx/circle-chevrons-left.tsx";
+import IconCircleChevronsRight from "$tabler_icons_tsx/tsx/circle-chevrons-right.tsx";
+import IconCircleChevronsLeft from "$tabler_icons_tsx/tsx/circle-chevrons-left.tsx";
 
 const SLIDE_DATA = [
   {

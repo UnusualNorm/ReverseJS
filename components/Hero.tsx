@@ -1,4 +1,4 @@
-import IconChevronRight from "tabler_icons_tsx/tsx/chevron-right.tsx";
+import IconChevronRight from "$tabler_icons_tsx/tsx/chevron-right.tsx";
 
 export default function Hero() {
   return (

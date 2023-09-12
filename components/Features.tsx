@@ -1,7 +1,7 @@
-import IconAlarm from "tabler_icons_tsx/tsx/alarm.tsx";
-import IconAirBalloon from "tabler_icons_tsx/tsx/air-balloon.tsx";
-import IconArmchair from "tabler_icons_tsx/tsx/armchair.tsx";
-import IconChevronRight from "tabler_icons_tsx/tsx/chevron-right.tsx";
+import IconAlarm from "$tabler_icons_tsx/tsx/alarm.tsx";
+import IconAirBalloon from "$tabler_icons_tsx/tsx/air-balloon.tsx";
+import IconArmchair from "$tabler_icons_tsx/tsx/armchair.tsx";
+import IconChevronRight from "$tabler_icons_tsx/tsx/chevron-right.tsx";
 
 export default function Features() {
   const featureItems = [

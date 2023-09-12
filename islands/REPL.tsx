@@ -19,6 +19,21 @@ export default function REPL(props: REPLProps) {
   const [clientId, setClientId] = useState(props.defaultClientId ?? "");
   const [code, setCode] = useState("onmessage = (e) => postMessage(e.data);");
   const [message, setMessage] = useState("Hello World!");
+  const [bundling, setBundling] = useState(false);
+  const bundledCodeRef = useRef("");
+
+  const bundleAndSend = async () => {
+    setBundling(true);
+    const res = await fetch("/api/bundle", {
+      method: "POST",
+      headers: { "x-client-id": clientId },
+      body: code,
+    });
+    const bundledCode = await res.text();
+    bundledCodeRef.current = bundledCode;
+    setBundling(false);
+    evalCode();
+  };
 
   useEffect(() => {
     setInterval(async () => {
@@ -35,7 +50,7 @@ export default function REPL(props: REPLProps) {
     fetch("/api/eval", {
       method: "POST",
       headers: { "x-client-id": clientId },
-      body: code,
+      body: bundledCodeRef.current,
     });
 
   const postMessage = () =>
@@ -90,9 +105,10 @@ export default function REPL(props: REPLProps) {
           style={{
             width: "25%",
           }}
-          onClick={() => evalCode()}
+          onClick={() => bundleAndSend()}
+          disabled={bundling}
         >
-          Eval
+          {bundling ? "Bundling..." : "Eval"}
         </Button>
       </div>
 

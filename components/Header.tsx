@@ -1,4 +1,4 @@
-import LemonIcon from "tabler_icons_tsx/tsx/lemon-2.tsx";
+import LemonIcon from "$tabler_icons_tsx/tsx/lemon-2.tsx";
 
 type Props = {
   active: string;

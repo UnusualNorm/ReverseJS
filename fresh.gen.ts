@@ -5,13 +5,14 @@
 import * as $0 from "./routes/_404.tsx";
 import * as $1 from "./routes/_app.tsx";
 import * as $2 from "./routes/_middleware.ts";
-import * as $3 from "./routes/api/clients.ts";
-import * as $4 from "./routes/api/eval.ts";
-import * as $5 from "./routes/api/messages.ts";
-import * as $6 from "./routes/api/post.ts";
-import * as $7 from "./routes/client.ts";
-import * as $8 from "./routes/index.tsx";
-import * as $9 from "./routes/repl.tsx";
+import * as $3 from "./routes/api/bundle.ts";
+import * as $4 from "./routes/api/clients.ts";
+import * as $5 from "./routes/api/eval.ts";
+import * as $6 from "./routes/api/messages.ts";
+import * as $7 from "./routes/api/post.ts";
+import * as $8 from "./routes/client.ts";
+import * as $9 from "./routes/index.tsx";
+import * as $10 from "./routes/repl.tsx";
 import * as $$0 from "./islands/BrowserOnly.tsx";
 import * as $$1 from "./islands/Button.tsx";
 import * as $$2 from "./islands/Carousel.tsx";
@@ -26,13 +27,14 @@ const manifest = {
     "./routes/_404.tsx": $0,
     "./routes/_app.tsx": $1,
     "./routes/_middleware.ts": $2,
-    "./routes/api/clients.ts": $3,
-    "./routes/api/eval.ts": $4,
-    "./routes/api/messages.ts": $5,
-    "./routes/api/post.ts": $6,
-    "./routes/client.ts": $7,
-    "./routes/index.tsx": $8,
-    "./routes/repl.tsx": $9,
+    "./routes/api/bundle.ts": $3,
+    "./routes/api/clients.ts": $4,
+    "./routes/api/eval.ts": $5,
+    "./routes/api/messages.ts": $6,
+    "./routes/api/post.ts": $7,
+    "./routes/client.ts": $8,
+    "./routes/index.tsx": $9,
+    "./routes/repl.tsx": $10,
   },
   islands: {
     "./islands/BrowserOnly.tsx": $$0,

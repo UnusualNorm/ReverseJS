@@ -40,8 +40,9 @@
     "utils/": "./utils/",
 
     "websocket_broadcastchannel/": "https://deno.land/x/websocket_broadcastchannel@0.7.0/",
+    "emit": "https://deno.land/x/emit@0.27.0/mod.ts",
 
-    "tabler_icons_tsx/": "https://deno.land/x/tabler_icons_tsx@0.0.4/",
+    "$tabler_icons_tsx/": "https://deno.land/x/tabler_icons_tsx@0.0.4/",
     "react-ace": "https://esm.sh/react-ace@10.1.0?alias=react:preact/compat"
   },
   "compilerOptions": {
