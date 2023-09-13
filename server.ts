@@ -336,7 +336,7 @@ export function onBroadcastPostMessage(
 
 export function isClientMessage(data: unknown): data is ClientMessage {
   if (typeof data !== "object" || data === null) return false;
-  if (!("id" in data) || typeof data.id !== "string") return false;
+  if (!("userId" in data) || typeof data.userId !== "string") return false;
   if (!("data" in data) || typeof data.data !== "string") return false;
   return true;
 }
@@ -458,7 +458,7 @@ export function onEval(
   const code = `(()=>{
     const userId = decodeURIComponent("${encodeURIComponent(userId)}");
     const userCode = decodeURIComponent("${encodeURIComponent(userCode)}");
-    const sendMessage = (message) => socket.send(JSON.stringify({ id: userId, data: message }));
+    const sendMessage = (data) => socket.send(JSON.stringify({ userId, data }));
 
     try {
       const worker = new Worker('data:application/javascript,' + encodeURIComponent(userCode), { type: "module" });

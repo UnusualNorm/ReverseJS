@@ -21,6 +21,7 @@ import * as $$4 from "./islands/ColoredButton.tsx";
 import * as $$5 from "./islands/Editor.tsx";
 import * as $$6 from "./islands/Input.tsx";
 import * as $$7 from "./islands/REPL.tsx";
+import * as $$8 from "./islands/ScriptDropdown.tsx";
 
 const manifest = {
   routes: {
@@ -45,6 +46,7 @@ const manifest = {
     "./islands/Editor.tsx": $$5,
     "./islands/Input.tsx": $$6,
     "./islands/REPL.tsx": $$7,
+    "./islands/ScriptDropdown.tsx": $$8,
   },
   baseUrl: import.meta.url,
 };

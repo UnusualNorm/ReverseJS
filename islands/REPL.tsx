@@ -6,6 +6,7 @@ import Button from "islands/Button.tsx";
 import Input from "islands/Input.tsx";
 import Editor from "islands/Editor.tsx";
 import ClientDropdown from "islands/ClientDropdown.tsx";
+import ScriptDropdown from "islands/ScriptDropdown.tsx";
 
 interface REPLProps {
   messages: Signal<{
@@ -18,6 +19,7 @@ interface REPLProps {
 export default function REPL(props: REPLProps) {
   const [clientId, setClientId] = useState(props.defaultClientId ?? "");
   const [code, setCode] = useState("onmessage = (e) => postMessage(e.data);");
+  const [codeFile, setCodeFile] = useState("");
   const [message, setMessage] = useState("Hello World!");
   const [bundling, setBundling] = useState(false);
   const bundledCodeRef = useRef("");
@@ -60,6 +62,21 @@ export default function REPL(props: REPLProps) {
       body: message,
     });
 
+  useEffect(() => {
+    (async () => {
+      if (codeFile) {
+        const res = await fetch(`/scripts/${codeFile}`);
+        if (res.status !== 200) {
+          alert(`Error: ${res.statusText}`);
+          return;
+        }
+
+        const code = await res.text();
+        setCode(code);
+      }
+    })();
+  }, [codeFile]);
+
   return (
     <div>
       <Editor
@@ -76,12 +93,19 @@ export default function REPL(props: REPLProps) {
         }}
       >
         <ClientDropdown
-          type="text"
           style={{
             width: "12.5%",
           }}
           value={clientId}
           onInput={(e) => setClientId(e.currentTarget.value)}
+        />
+
+        <ScriptDropdown
+          style={{
+            width: "12.5%",
+          }}
+          value={codeFile}
+          onInput={(e) => setCodeFile(e.currentTarget.value)}
         />
 
         <Input
@@ -103,7 +127,7 @@ export default function REPL(props: REPLProps) {
 
         <Button
           style={{
-            width: "25%",
+            width: "12.5%",
           }}
           onClick={() => bundleAndSend()}
           disabled={bundling}
@@ -124,7 +148,11 @@ export default function REPL(props: REPLProps) {
             <tr>
               {/* Alight to middle */}
               <td class={"text-center"}>{message.type}</td>
-              <td class={"text-center"}>{JSON.stringify(message.data)}</td>
+              <td class={"text-center"}>
+                {typeof message.data !== "string"
+                  ? JSON.stringify(message.data)
+                  : message.data}
+              </td>
             </tr>
           ))}
         </tbody>
