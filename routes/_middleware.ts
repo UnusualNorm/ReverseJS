@@ -1,5 +1,5 @@
 import { MiddlewareHandlerContext } from "$fresh/server.ts";
-import { PASSWORD } from "../env.ts";
+import { REVERSEJS_PASSWORD } from "../env.ts";
 
 export interface GlobalState {
   id: string;
@@ -21,7 +21,7 @@ export const handler = [
     // authentication middleware
 
     const auth = {
-      password: PASSWORD,
+      password: REVERSEJS_PASSWORD,
     };
 
     // parse login and password from headers
