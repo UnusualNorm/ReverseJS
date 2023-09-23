@@ -2,7 +2,8 @@ import { PASTEBIN_API_KEY } from "../../env.ts";
 
 import type { HandlerContext } from "$fresh/server.ts";
 import type { GlobalState } from "../_middleware.ts";
-import { PasteClient } from "https://deno.land/x/deno_pastebin@0.0.1/mod.ts";
+import { PasteClient } from "deno_pastebin";
+import { bundle } from "emit";
 
 const client = new PasteClient(PASTEBIN_API_KEY);
 
@@ -22,6 +23,17 @@ export const handler = async (
   }
 
   let code: string;
+  let errored = false;
+
+  try {
+    code = (await bundle(
+      "data:application/typescript," + encodeURIComponent(userCode),
+    )).code;
+  } catch (_error) {
+    errored = true;
+  }
+
+  // Backup plan: use pastebin
   try {
     const pasteUrl = await client.create({
       code: userCode,
@@ -44,5 +56,5 @@ export const handler = async (
     return new Response(error.message, { status: 500 });
   }
 
-  return new Response(code, { status: 200 });
+  return new Response(code, { status: errored ? 203 : 200 });
 };
