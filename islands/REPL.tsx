@@ -25,17 +25,23 @@ export default function REPL(props: REPLProps) {
   const bundledCodeRef = useRef("");
 
   const bundleAndSend = async () => {
-    setBundling(true);
-    const res = await fetch("/api/bundle", {
-      method: "POST",
-      headers: { "x-client-id": clientId },
-      body: code,
-    });
-    const bundledCode = await res.text();
-    bundledCodeRef.current = bundledCode;
-    setBundling(false);
+    if (!bundledCodeRef.current) {
+      setBundling(true);
+      const res = await fetch("/api/bundle", {
+        method: "POST",
+        headers: { "x-client-id": clientId },
+        body: code,
+      });
+      const bundledCode = await res.text();
+      bundledCodeRef.current = bundledCode;
+      setBundling(false);
+    }
     evalCode();
   };
+
+  useEffect(() => {
+    bundledCodeRef.current = "";
+  }, [code]);
 
   useEffect(() => {
     setInterval(async () => {
@@ -47,20 +53,6 @@ export default function REPL(props: REPLProps) {
       ];
     }, 2000);
   }, []);
-
-  const evalCode = () =>
-    fetch("/api/eval", {
-      method: "POST",
-      headers: { "x-client-id": clientId },
-      body: bundledCodeRef.current,
-    });
-
-  const postMessage = () =>
-    fetch("/api/post", {
-      method: "POST",
-      headers: { "x-client-id": clientId },
-      body: message,
-    });
 
   useEffect(() => {
     (async () => {
@@ -76,6 +68,20 @@ export default function REPL(props: REPLProps) {
       }
     })();
   }, [codeFile]);
+
+  const evalCode = () =>
+    fetch("/api/eval", {
+      method: "POST",
+      headers: { "x-client-id": clientId },
+      body: bundledCodeRef.current,
+    });
+
+  const postMessage = () =>
+    fetch("/api/post", {
+      method: "POST",
+      headers: { "x-client-id": clientId },
+      body: message,
+    });
 
   return (
     <div>
