@@ -1,6 +1,7 @@
 import { ComponentChildren } from "preact";
 import LemonIcon from "$tabler_icons_tsx/tsx/lemon-2.tsx";
 import BrandGithub from "$tabler_icons_tsx/tsx/brand-github.tsx";
+
 type Props = {
   children: ComponentChildren;
 };

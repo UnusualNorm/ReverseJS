@@ -1,15 +1,13 @@
 import type { JSX } from "preact";
-import type { ClientInfo } from "../server.ts";
 import { IS_BROWSER } from "$fresh/runtime.ts";
-import { useEffect, useState } from "preact/hooks";
 
-export const scripts = [
+const scripts = [
   "echo",
   "install",
   "powershell",
   "rcpl",
   "repl",
-] as const;
+];
 
 export default function ScriptDropdown(
   props: JSX.HTMLAttributes<HTMLSelectElement>,

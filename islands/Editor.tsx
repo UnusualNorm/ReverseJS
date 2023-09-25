@@ -1,4 +1,4 @@
-import AceEditor, { IAceEditorProps } from "react-ace";
+import AceEditor, { type IAceEditorProps } from "react-ace";
 import BrowserOnly from "islands/BrowserOnly.tsx";
 
 const Editor = (props: IAceEditorProps) => {
