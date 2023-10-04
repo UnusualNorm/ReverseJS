@@ -38,13 +38,15 @@
     "components/": "./components/",
     "types/": "./types/",
     "utils/": "./utils/",
+    "hooks/": "./hooks/",
 
     "websocket_broadcastchannel/": "https://deno.land/x/websocket_broadcastchannel@0.7.0/",
-    "emit": "https://deno.land/x/emit@0.27.0/mod.ts",
-    "deno_pastebin": "https://deno.land/x/deno_pastebin@0.0.1/mod.ts",
+    "emit": "https://deno.land/x/emit@0.28.0/mod.ts",
 
     "$tabler_icons_tsx/": "https://deno.land/x/tabler_icons_tsx@0.0.4/",
-    "react-ace": "https://esm.sh/react-ace@10.1.0?alias=react:preact/compat"
+    "react-ace": "https://esm.sh/react-ace@10.1.0?alias=react:preact/compat",
+
+    "xterm": "https://esm.sh/xterm@5.3.0"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

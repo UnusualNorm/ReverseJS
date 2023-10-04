@@ -1,42 +1,40 @@
-import type { ClientMessage } from "../server.ts";
-import type { Signal } from "@preact/signals";
+import type { JSX } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
+import { useMessages } from "hooks/useMessages.ts";
 
 import Button from "islands/Button.tsx";
 import Input from "islands/Input.tsx";
 import Editor from "islands/Editor.tsx";
-import ClientDropdown from "islands/ClientDropdown.tsx";
-import ScriptDropdown from "islands/ScriptDropdown.tsx";
+import ClientSelect from "islands/ClientSelect.tsx";
+import ScriptDropdown, { scripts } from "islands/ScriptDropdown.tsx";
 
-interface REPLProps {
-  messages: Signal<{
-    type: string;
-    data: unknown; // probably string
-  }[]>;
-  defaultClientId?: string;
-}
+export default function REPL(props: JSX.HTMLAttributes<HTMLDivElement>) {
+  const [clientId, setClientId] = useState("");
+  const messages = useMessages();
 
-export default function REPL(props: REPLProps) {
-  const [clientId, setClientId] = useState(props.defaultClientId ?? "");
-  const [code, setCode] = useState("onmessage = (e) => postMessage(e.data);");
-  const [codeFile, setCodeFile] = useState("");
-  const [message, setMessage] = useState("Hello World!");
+  const [code, setCode] = useState("");
+  const [preset, setPreset] = useState<(typeof scripts)[number]>(scripts[0]);
+  const [message, setMessage] = useState("");
+
   const [bundling, setBundling] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [evaluating, setEvaluating] = useState(false);
+
+  const [failedBundling, setFailedBundling] = useState(false);
+  const [failedSending, setFailedSending] = useState(false);
+  // TODO: Scan for errors and set failedEvaluating accordingly
+  const [failedEvaluating, setFailedEvaluating] = useState(false);
+
   const bundledCodeRef = useRef("");
 
   const bundleAndSend = async () => {
-    if (!bundledCodeRef.current) {
-      setBundling(true);
-      const res = await fetch("/api/bundle", {
-        method: "POST",
-        headers: { "x-client-id": clientId },
-        body: code,
-      });
-      const bundledCode = await res.text();
-      bundledCodeRef.current = bundledCode;
-      setBundling(false);
+    if (!bundledCodeRef.current || failedBundling) {
+      const bundled = await bundleCode();
+      if (!bundled) return;
     }
-    evalCode();
+
+    const sent = await evalCode();
+    if (!sent) return;
   };
 
   useEffect(() => {
@@ -44,20 +42,9 @@ export default function REPL(props: REPLProps) {
   }, [code]);
 
   useEffect(() => {
-    setInterval(async () => {
-      const res = await fetch("/api/messages");
-      const messages: ClientMessage[] = await res.json();
-      props.messages.value = [
-        ...props.messages.value,
-        ...messages.map((message) => JSON.parse(message.data)),
-      ];
-    }, 2000);
-  }, []);
-
-  useEffect(() => {
     (async () => {
-      if (codeFile) {
-        const res = await fetch(`/scripts/${codeFile}`);
+      if (preset) {
+        const res = await fetch(`/scripts/${preset}.ts`);
         if (res.status !== 200) {
           alert(`Error: ${res.statusText}`);
           return;
@@ -67,14 +54,44 @@ export default function REPL(props: REPLProps) {
         setCode(code);
       }
     })();
-  }, [codeFile]);
+  }, [preset]);
 
-  const evalCode = () =>
-    fetch("/api/eval", {
+  const bundleCode = async (): Promise<boolean> => {
+    setBundling(true);
+    const res = await fetch("/api/bundle", {
+      method: "POST",
+      headers: { "x-client-id": clientId },
+      body: code,
+    });
+
+    if (!res.ok) {
+      setFailedBundling(true);
+      return false;
+    }
+
+    const bundledCode = await res.text();
+    bundledCodeRef.current = bundledCode;
+    setBundling(false);
+    return true;
+  };
+
+  const evalCode = async (): Promise<boolean> => {
+    setSending(true);
+    const res = await fetch("/api/eval", {
       method: "POST",
       headers: { "x-client-id": clientId },
       body: bundledCodeRef.current,
     });
+
+    if (!res.ok) {
+      setFailedSending(true);
+      return false;
+    }
+
+    setSending(false);
+    setEvaluating(true);
+    return true;
+  };
 
   const postMessage = () =>
     fetch("/api/post", {
@@ -84,7 +101,7 @@ export default function REPL(props: REPLProps) {
     });
 
   return (
-    <div>
+    <div {...props}>
       <Editor
         width="100%"
         value={code}
@@ -98,7 +115,7 @@ export default function REPL(props: REPLProps) {
           justifyContent: "space-between",
         }}
       >
-        <ClientDropdown
+        <ClientSelect
           style={{
             width: "12.5%",
           }}
@@ -110,8 +127,8 @@ export default function REPL(props: REPLProps) {
           style={{
             width: "12.5%",
           }}
-          value={codeFile}
-          onInput={(e) => setCodeFile(e.currentTarget.value)}
+          value={preset}
+          onInput={(e) => setPreset(e.currentTarget.value as any)}
         />
 
         <Input
@@ -119,6 +136,8 @@ export default function REPL(props: REPLProps) {
             width: "50%",
           }}
           value={message}
+          disabled={!clientId || !evaluating || failedEvaluating || sending ||
+            failedSending || bundling || failedBundling}
           onInput={(e) => setMessage(e.currentTarget.value)}
         />
 
@@ -126,6 +145,8 @@ export default function REPL(props: REPLProps) {
           style={{
             width: "12.5%",
           }}
+          disabled={!clientId || !evaluating || failedEvaluating || sending ||
+            failedSending || bundling || failedBundling}
           onClick={() => postMessage()}
         >
           Post
@@ -136,9 +157,15 @@ export default function REPL(props: REPLProps) {
             width: "12.5%",
           }}
           onClick={() => bundleAndSend()}
-          disabled={bundling}
+          disabled={!clientId || bundling || sending}
         >
-          {bundling ? "Bundling..." : "Eval"}
+          {sending
+            ? "Sending..."
+            : bundling
+            ? "Bundling..."
+            : (failedBundling || failedSending)
+            ? "Failed..."
+            : "Eval"}
         </Button>
       </div>
 
@@ -150,17 +177,19 @@ export default function REPL(props: REPLProps) {
           </tr>
         </thead>
         <tbody>
-          {props.messages.value.toReversed().map((message) => (
-            <tr>
-              {/* Alight to middle */}
-              <td class={"text-center"}>{message.type}</td>
-              <td class={"text-center"}>
-                {typeof message.data !== "string"
-                  ? JSON.stringify(message.data)
-                  : message.data}
-              </td>
-            </tr>
-          ))}
+          {messages.toReversed().map((message) => {
+            const data = JSON.parse(message.data);
+            return (
+              <tr>
+                <td class="text-center">{data.type}</td>
+                <td class="text-center">
+                  {typeof data.data !== "string"
+                    ? JSON.stringify(data.data)
+                    : data.data}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

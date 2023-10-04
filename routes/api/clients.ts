@@ -9,6 +9,7 @@ export const handler = (
   const clients = getClients();
 
   const response = new Response(JSON.stringify(clients ?? []), {
+    status: 200,
     headers: {
       "content-type": "application/json",
     },

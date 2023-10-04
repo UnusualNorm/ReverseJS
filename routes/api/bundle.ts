@@ -26,8 +26,8 @@ export const handler = async (
       );
 
       return new Response(bundled.code, { status: 200 });
-    } catch (_error) {
-      return new Response(null, { status: 500 });
+    } catch (error) {
+      return new Response(String(error), { status: 500 });
     }
   }
 

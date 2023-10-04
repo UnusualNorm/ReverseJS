@@ -16,12 +16,14 @@ import * as $10 from "./routes/repl.tsx";
 import * as $$0 from "./islands/BrowserOnly.tsx";
 import * as $$1 from "./islands/Button.tsx";
 import * as $$2 from "./islands/Carousel.tsx";
-import * as $$3 from "./islands/ClientDropdown.tsx";
+import * as $$3 from "./islands/ClientSelect.tsx";
 import * as $$4 from "./islands/ColoredButton.tsx";
 import * as $$5 from "./islands/Editor.tsx";
 import * as $$6 from "./islands/Input.tsx";
 import * as $$7 from "./islands/REPL.tsx";
 import * as $$8 from "./islands/ScriptDropdown.tsx";
+import * as $$9 from "./islands/Select.tsx";
+import * as $$10 from "./islands/Terminal.tsx";
 
 const manifest = {
   routes: {
@@ -41,12 +43,14 @@ const manifest = {
     "./islands/BrowserOnly.tsx": $$0,
     "./islands/Button.tsx": $$1,
     "./islands/Carousel.tsx": $$2,
-    "./islands/ClientDropdown.tsx": $$3,
+    "./islands/ClientSelect.tsx": $$3,
     "./islands/ColoredButton.tsx": $$4,
     "./islands/Editor.tsx": $$5,
     "./islands/Input.tsx": $$6,
     "./islands/REPL.tsx": $$7,
     "./islands/ScriptDropdown.tsx": $$8,
+    "./islands/Select.tsx": $$9,
+    "./islands/Terminal.tsx": $$10,
   },
   baseUrl: import.meta.url,
 };

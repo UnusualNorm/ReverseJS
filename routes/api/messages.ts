@@ -10,6 +10,7 @@ export const handler = (
   const msgs = messages.get(id);
 
   const response = new Response(JSON.stringify(msgs ?? []), {
+    status: 200,
     headers: {
       "content-type": "application/json",
     },
