@@ -29,7 +29,7 @@ onmessage = (e) => {
         if (done) {
           break;
         }
-        postMessage(value);
+        postMessage(new TextDecoder().decode(value));
       }
       reader.releaseLock();
     })();
@@ -41,7 +41,7 @@ onmessage = (e) => {
         if (done) {
           break;
         }
-        postMessage(value);
+        postMessage(new TextDecoder().decode(value));
       }
       reader.releaseLock();
     })();
