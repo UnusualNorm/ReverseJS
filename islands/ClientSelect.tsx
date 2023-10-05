@@ -6,7 +6,7 @@ import Select from "islands/Select.tsx";
 export default function ClientSelect(
   props: JSX.HTMLAttributes<HTMLSelectElement>,
 ) {
-  const clients = useClients();
+  const [_previousClients, clients] = useClients();
 
   return (
     <Select {...props}>

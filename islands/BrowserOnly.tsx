@@ -10,5 +10,5 @@ export default function BrowserOnly(
   { children, fallback, ...divProps }: BrowserOnlyProps,
 ) {
   if (!IS_BROWSER) return fallback ?? <p>Loading...</p>;
-  return <div {...divProps}>{children()}</div>;
+  return children();
 }

@@ -9,6 +9,8 @@ import {
   remoteClients,
   serverId,
 } from "./bridge.ts";
+import { sockets as messageListeners } from "./routes/api/messages.ts";
+import { sockets as clientListeners } from "./routes/api/clients.ts";
 
 export type ClientInfo =
   & {
@@ -77,7 +79,12 @@ export function onMessage(
   message: ClientMessage,
   remote = false,
 ) {
-  messages.set(userId, [...(messages.get(userId) ?? []), message]);
+  if (messageListeners.has(userId)) {
+    messageListeners.get(userId)!.send(JSON.stringify(message));
+  } else {
+    messages.set(userId, [...(messages.get(userId) ?? []), message]);
+  }
+
   if (!remote) broadcastClientMessage(userId, message);
 }
 
@@ -99,6 +106,10 @@ export function onClientConnected(
 
     remoteClients.set(args[1], Array.from(newRemoteClients));
   }
+
+  for (const listener of clientListeners) {
+    listener.send(JSON.stringify([true, clientId]));
+  }
 }
 
 export function onClientDisconnected(clientId: string, remote = false) {
@@ -115,6 +126,10 @@ export function onClientDisconnected(clientId: string, remote = false) {
         newRemoteClients,
       );
     } else remoteClients.delete(serverId);
+  }
+
+  for (const listener of clientListeners) {
+    listener.send(JSON.stringify([false, clientId]));
   }
 }
 

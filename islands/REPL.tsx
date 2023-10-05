@@ -1,6 +1,7 @@
 import type { JSX } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { useMessages } from "hooks/useMessages.ts";
+import { getDifference } from "utils/arrays.ts";
 
 import Button from "islands/Button.tsx";
 import Input from "islands/Input.tsx";
@@ -10,10 +11,10 @@ import ScriptDropdown, { scripts } from "islands/ScriptDropdown.tsx";
 
 export default function REPL(props: JSX.HTMLAttributes<HTMLDivElement>) {
   const [clientId, setClientId] = useState("");
-  const messages = useMessages();
+  const [oldMessages, messages] = useMessages();
 
   const [code, setCode] = useState("");
-  const [preset, setPreset] = useState<(typeof scripts)[number]>(scripts[0]);
+  const [preset, setPreset] = useState<string>(scripts[0]);
   const [message, setMessage] = useState("");
 
   const [bundling, setBundling] = useState(false);
@@ -22,7 +23,6 @@ export default function REPL(props: JSX.HTMLAttributes<HTMLDivElement>) {
 
   const [failedBundling, setFailedBundling] = useState(false);
   const [failedSending, setFailedSending] = useState(false);
-  // TODO: Scan for errors and set failedEvaluating accordingly
   const [failedEvaluating, setFailedEvaluating] = useState(false);
 
   const bundledCodeRef = useRef("");
@@ -38,59 +38,105 @@ export default function REPL(props: JSX.HTMLAttributes<HTMLDivElement>) {
   };
 
   useEffect(() => {
+    setBundling(false);
+    setSending(false);
+    setEvaluating(false);
+    setFailedBundling(false);
+    setFailedSending(false);
+    setFailedEvaluating(false);
+  }, [clientId]);
+
+  useEffect(() => {
     bundledCodeRef.current = "";
   }, [code]);
 
   useEffect(() => {
     (async () => {
-      if (preset) {
+      if (!preset) return;
+      try {
         const res = await fetch(`/scripts/${preset}.ts`);
         if (res.status !== 200) {
-          alert(`Error: ${res.statusText}`);
+          setCode("");
           return;
         }
 
         const code = await res.text();
         setCode(code);
+      } catch (e) {
+        console.error(e);
+        setCode("");
       }
     })();
   }, [preset]);
 
+  useEffect(() => {
+    const [_removedMessages, newMessages] = getDifference(
+      oldMessages,
+      messages,
+      (a, b) => a.timestamp === b.timestamp && a.data === b.data,
+    );
+
+    for (const message of newMessages) {
+      if (message.clientId !== clientId) continue;
+      if (JSON.parse(message.data).type !== "error") continue;
+      setFailedEvaluating(true);
+      setEvaluating(false);
+      return;
+    }
+  }, [messages]);
+
   const bundleCode = async (): Promise<boolean> => {
     setBundling(true);
-    const res = await fetch("/api/bundle", {
-      method: "POST",
-      headers: { "x-client-id": clientId },
-      body: code,
-    });
+    try {
+      const res = await fetch("/api/bundle", {
+        method: "POST",
+        headers: { "x-client-id": clientId },
+        body: code,
+      });
 
-    if (!res.ok) {
+      if (!res.ok) {
+        setFailedBundling(true);
+        setBundling(false);
+        return false;
+      }
+
+      const bundledCode = await res.text();
+      bundledCodeRef.current = bundledCode;
+      setFailedBundling(false);
+      setBundling(false);
+      return true;
+    } catch (e) {
+      console.error(e);
       setFailedBundling(true);
+      setBundling(false);
       return false;
     }
-
-    const bundledCode = await res.text();
-    bundledCodeRef.current = bundledCode;
-    setBundling(false);
-    return true;
   };
 
   const evalCode = async (): Promise<boolean> => {
-    setSending(true);
-    const res = await fetch("/api/eval", {
-      method: "POST",
-      headers: { "x-client-id": clientId },
-      body: bundledCodeRef.current,
-    });
+    try {
+      setSending(true);
+      setFailedEvaluating(false);
+      const res = await fetch("/api/eval", {
+        method: "POST",
+        headers: { "x-client-id": clientId },
+        body: bundledCodeRef.current,
+      });
 
-    if (!res.ok) {
+      if (!res.ok) {
+        setFailedSending(true);
+        return false;
+      }
+
+      setSending(false);
+      setEvaluating(true);
+      return true;
+    } catch (e) {
+      console.error(e);
       setFailedSending(true);
+      setSending(false);
       return false;
     }
-
-    setSending(false);
-    setEvaluating(true);
-    return true;
   };
 
   const postMessage = () =>
@@ -102,11 +148,45 @@ export default function REPL(props: JSX.HTMLAttributes<HTMLDivElement>) {
 
   return (
     <div {...props}>
-      <Editor
-        width="100%"
-        value={code}
-        onChange={(code) => setCode(code)}
-      />
+      <div
+        className={"flex flex-row items-start"}
+      >
+        <div className="w-1/2">
+          <Editor
+            value={code}
+            onChange={(code) => setCode(code)}
+          />
+        </div>
+
+        {/* Make this scale vertically only to where it won't shift content down */}
+        <div className="w-1/2 overflow-auto h-96">
+          <table>
+            <thead>
+              <tr>
+                <th class="w-1/6">Type</th>
+                <th class="w-5/6">Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              {messages.toReversed().filter((
+                message,
+              ) => message.clientId === clientId).map((message) => {
+                const data = JSON.parse(message.data);
+                return (
+                  <tr>
+                    <td class="text-center">{data.type}</td>
+                    <td class="text-center">
+                      {typeof data.data !== "string"
+                        ? JSON.stringify(data.data)
+                        : data.data}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       <div
         style={{
@@ -120,6 +200,7 @@ export default function REPL(props: JSX.HTMLAttributes<HTMLDivElement>) {
             width: "12.5%",
           }}
           value={clientId}
+          disabled={bundling || sending}
           onInput={(e) => setClientId(e.currentTarget.value)}
         />
 
@@ -128,7 +209,8 @@ export default function REPL(props: JSX.HTMLAttributes<HTMLDivElement>) {
             width: "12.5%",
           }}
           value={preset}
-          onInput={(e) => setPreset(e.currentTarget.value as any)}
+          disabled={bundling || sending}
+          onInput={(e) => setPreset(e.currentTarget.value)}
         />
 
         <Input
@@ -168,30 +250,6 @@ export default function REPL(props: JSX.HTMLAttributes<HTMLDivElement>) {
             : "Eval"}
         </Button>
       </div>
-
-      <table class="w-full">
-        <thead>
-          <tr>
-            <th class="w-1/6">Type</th>
-            <th class="w-5/6">Data</th>
-          </tr>
-        </thead>
-        <tbody>
-          {messages.toReversed().map((message) => {
-            const data = JSON.parse(message.data);
-            return (
-              <tr>
-                <td class="text-center">{data.type}</td>
-                <td class="text-center">
-                  {typeof data.data !== "string"
-                    ? JSON.stringify(data.data)
-                    : data.data}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
     </div>
   );
 }

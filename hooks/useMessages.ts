@@ -1,28 +1,49 @@
 import type { ClientMessage } from "../server.ts";
 import { IS_BROWSER } from "$fresh/runtime.ts";
-import { useRef, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { signal } from "@preact/signals";
 
 export const fetchMessages = async (): Promise<ClientMessage[]> => {
   const res = await fetch("/api/messages");
-  return await res.json();
+  const json = await res.json();
+  messages.value = [...messages.value, ...json];
+  return json;
 };
 
 export const messages = signal<ClientMessage[]>([]);
 if (IS_BROWSER) {
-  setInterval(async () => {
-    messages.value = [...messages.value, ...(await fetchMessages())];
-  }, 2000);
+  fetchMessages();
+  const websocketUrl = `ws${
+    location.protocol === "https:" ? "s" : ""
+  }://${location.host}/api/messages`;
+  const websocket = new WebSocket(websocketUrl);
+  websocket.onmessage = (ev) => {
+    const data = JSON.parse(ev.data);
+    messages.value = [...messages.value, data];
+  };
+
+  websocket.onclose = () => {
+    setTimeout(() => {
+      messages.value = [];
+      fetchMessages();
+    }, 2500);
+  };
 }
 
-export const useMessages = (): ClientMessage[] => {
+export const useMessages = (): [
+  previousMessages: ClientMessage[],
+  messages: ClientMessage[],
+] => {
+  const [previousData, setPreviousData] = useState<ClientMessage[]>([]);
   const [data, setData] = useState<ClientMessage[]>(messages.value);
-  const subscribedRef = useRef(false);
 
-  if (IS_BROWSER && !subscribedRef.current) {
-    messages.subscribe(setData);
-    subscribedRef.current = true;
-  }
+  useEffect(() => {
+    if (!IS_BROWSER) return;
+    messages.subscribe((messages) => {
+      setPreviousData(data);
+      setData(messages);
+    });
+  }, [IS_BROWSER]);
 
-  return data;
+  return [previousData, data];
 };
