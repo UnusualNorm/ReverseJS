@@ -149,17 +149,18 @@ export default function REPL(props: JSX.HTMLAttributes<HTMLDivElement>) {
   return (
     <div {...props}>
       <div
-        className={"flex flex-row items-start"}
+        className={"flex flex-row items-start w-full h-full"}
       >
-        <div className="w-1/2">
+        <div className="w-1/2 h-full">
           <Editor
             value={code}
             onChange={(code) => setCode(code)}
+            width="100%"
+            height="100%"
           />
         </div>
 
-        {/* Make this scale vertically only to where it won't shift content down */}
-        <div className="w-1/2 overflow-auto h-96">
+        <div className="w-1/2 overflow-auto h-full">
           <table>
             <thead>
               <tr>

@@ -14,10 +14,14 @@ export default function App(
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>ReverseJS</title>
       </head>
-      <body>
-        <Header active={route} />
-        <Component />
-        <Footer children={undefined} />
+      <body className="flex flex-col min-h-screen">
+        <div className="flex-grow">
+          <Header active={route} />
+          <Component />
+        </div>
+        <div className="position-sticky bottom-0">
+          <Footer children={undefined} />
+        </div>
       </body>
     </html>
   );

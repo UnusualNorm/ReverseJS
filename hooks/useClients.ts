@@ -5,8 +5,12 @@ import { signal } from "@preact/signals";
 
 export const fetchClients = async (): Promise<ClientInfo[]> => {
   const res = await fetch("/api/clients");
+  // Extremely minor race condition here.
+  // A client could connect with websocket as we're parsing JSON,
+  // causing them to be overwritten and excluded from the list
   const json = await res.json();
-  clients.value = [...clients.value, ...json];
+  // The api gives us a complete list of clients
+  clients.value = json;
   return json;
 };
 
